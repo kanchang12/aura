@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gcloud run deploy:*)",
+      "Bash(curl:*)",
+      "Bash(gcloud run services logs read:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nClean backend - Gemini + ElevenLabs integration only\n\n- Single endpoint /api/analyze for conversation analysis\n- No auth, no database, no payments\n- Stateless API for reusability\n- Root route working (no 404)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+    ]
+  }
+}

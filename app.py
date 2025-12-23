@@ -1,68 +1,101 @@
 import os
-import json
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
+import google.generativeai as genai
 
-# 1. THE CONFIG (Forces project IDs so it NEVER crashes)
-class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-123')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///aura.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    GOOGLE_CLOUD_PROJECT = os.environ.get('GOOGLE_CLOUD_PROJECT', 'thinking-land-481118-k3')
-    VERTEX_AI_LOCATION = os.environ.get('VERTEX_AI_LOCATION', 'europe-west1')
-    ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+app = Flask(__name__)
+CORS(app, origins=['*'])
 
-db = SQLAlchemy()
+# Configure Gemini
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
-# 2. THE SERVICE (Built-in to prevent import errors)
-class AuraService:
-    def __init__(self):
-        # Point to the exact file you have in your root directory
-        self.kb_path = os.path.join(os.path.dirname(__file__), 'cbt_knowledge_base.json')
-    
-    def get_response(self, text):
-        # IMPLEMENTS THE 70/30 LISTENING RULE: Validate first, talk less.
-        # This stops the AI from being "preachy"
-        return {
-            "voice_response": "I hear you, and it's completely valid to feel that way. Tell me more about what's on your mind.",
-            "suggested_task": "Focus on breathing for 1 minute",
-            "detected_distortion": None
+# ElevenLabs config (for client integration)
+ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY', '')
+ELEVENLABS_AGENT_ID = os.environ.get('ELEVENLABS_AGENT_ID', 'agent_4201ka0zmyzdexs9hhw24mce6rzb')
+
+@app.route('/')
+def index():
+    return jsonify({
+        'service': 'Aura AI - ElevenLabs + Gemini Backend',
+        'status': 'running',
+        'version': '1.0',
+        'endpoints': {
+            '/': 'API info',
+            '/health': 'Health check',
+            '/api/analyze': 'POST - Analyze conversation'
         }
+    }), 200
 
-def create_app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    
-    db.init_app(app)
-    CORS(app, origins=app.config['ALLOWED_ORIGINS'], supports_credentials=True)
+@app.route('/health')
+def health():
+    return jsonify({'status': 'healthy'}), 200
 
-    aura = AuraService()
+@app.route('/api/analyze', methods=['POST'])
+def analyze():
+    """
+    Analyze conversation from ElevenLabs
 
-    # --- ROUTES ---
-    @app.route('/health')
-    def health():
-        return jsonify({"status": "active"}), 200
+    Request:
+    {
+        "id": "user123",
+        "history": [
+            {"role": "user", "content": "I keep procrastinating"},
+            {"role": "assistant", "content": "Tell me more..."}
+        ]
+    }
 
-    @app.route('/api/chat', methods=['POST'])
-    def chat():
-        data = request.json or {}
-        user_msg = data.get('message', '')
-        # Return the listening-focused response
-        return jsonify(aura.get_response(user_msg))
+    Response:
+    {
+        "analysis": "...",
+        "user_id": "user123"
+    }
+    """
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('id', 'anonymous')
+        history = data.get('history', [])
 
-    # Bypassing the broken Kafka/Blueprint imports entirely
-    with app.app_context():
-        try:
-            db.create_all()
-        except:
-            pass
+        if not history:
+            return jsonify({'error': 'History required'}), 400
 
-    return app
+        # Build conversation text
+        conversation = "\n".join([
+            f"{h.get('role', 'user')}: {h.get('content', '')}"
+            for h in history
+        ])
 
-# Gunicorn entry point
-app = create_app()
+        # Gemini analyzes
+        if GEMINI_API_KEY:
+            model = genai.GenerativeModel('gemini-1.5-flash')
+
+            prompt = f"""Analyze this CBT therapy conversation:
+
+{conversation}
+
+Provide:
+1. Cognitive distortions identified
+2. Progress assessment
+3. Recommendations
+4. Crisis risk (low/medium/high)
+
+Format as JSON."""
+
+            response = model.generate_content(prompt)
+
+            return jsonify({
+                'user_id': user_id,
+                'analysis': response.text,
+                'status': 'success'
+            }), 200
+        else:
+            return jsonify({'error': 'Gemini not configured'}), 500
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 8080))
+    port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
