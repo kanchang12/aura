@@ -9,7 +9,9 @@
       "Bash(git push:*)",
       "Bash(flutter pub add:*)",
       "Bash(flutter pub run:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gcloud run services delete:*)",
+      "Bash(cat:*)"
     ]
   }
 }

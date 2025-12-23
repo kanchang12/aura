@@ -26,4 +26,4 @@ EXPOSE 8080
 
 # Use Gunicorn for production (ensure gunicorn is in your requirements.txt)
 # Replace 'app:app' with the variable name of your Flask instance in app.py
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:create_app()"]]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
