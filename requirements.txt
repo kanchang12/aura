@@ -1,48 +1,48 @@
 # Flask and Web Framework
-Flask==3.0.0
-Flask-CORS==4.0.0
-Flask-SQLAlchemy==3.1.1
-Flask-Migrate==4.0.5
-Flask-Login==0.6.3
-Flask-Bcrypt==1.0.1
-Flask-WTF==1.2.1
+Flask
+Flask-CORS
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Flask-Bcrypt
+Flask-WTF
 
 # Database
-psycopg2-binary==2.9.9
-SQLAlchemy==2.0.23
+psycopg2-binary
+SQLAlchemy
 
 # Google Cloud
-google-cloud-aiplatform==1.38.1
-google-cloud-storage==2.14.0
-vertexai==1.38.1
+google-cloud-aiplatform
+google-cloud-storage
+vertexai
 
 # ElevenLabs
-elevenlabs==1.5.0
+elevenlabs
 
 # Confluent Kafka
-confluent-kafka==2.3.0
+confluent-kafka
 
 # Payment Processing
-stripe==7.8.0
+stripe
 
 # Security and Encryption
-cryptography==41.0.7
-python-dotenv==1.0.0
-PyJWT==2.8.0
+cryptography
+python-dotenv
+PyJWT
 
 # Data Processing
-pandas==2.1.4
-numpy==1.26.2
+pandas
+numpy
 
 # API and Utilities
-requests==2.31.0
-python-dateutil==2.8.2
-pytz==2023.3
+requests
+python-dateutil
+pytz
 
 # Blog and SEO
-markdown==3.5.1
-bleach==6.1.0
-python-slugify==8.0.1
+markdown
+bleach
+python-slugify
 
 # Monitoring
-gunicorn==21.2.0
+gunicorn
