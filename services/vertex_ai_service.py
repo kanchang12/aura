@@ -20,28 +20,7 @@ class VertexAIService:
         self.knowledge_base = self._load_knowledge_base()
 
     def _load_knowledge_base(self):
-        """Load JSON knowledge base files"""
-        kb_path = os.path.join(os.path.dirname(__file__), '..', 'knowledge_base')
-        knowledge = {}
-
-        try:
-            # Load PST framework
-            with open(os.path.join(kb_path, 'pst.json'), 'r') as f:
-                knowledge['pst'] = json.load(f)
-
-            # Load Behavioral Activation
-            with open(os.path.join(kb_path, 'behavioral_activation.json'), 'r') as f:
-                knowledge['behavioral_activation'] = json.load(f)
-
-            # Load Cognitive Distortions
-            with open(os.path.join(kb_path, 'cognitive_distortions.json'), 'r') as f:
-                knowledge['cognitive_distortions'] = json.load(f)
-
-        except FileNotFoundError as e:
-            print(f"Warning: Knowledge base file not found: {e}")
-            knowledge = {}
-
-        return knowledge
+        pass
 
     def build_system_prompt(self):
         """Build the CBT coaching system prompt"""
