@@ -44,8 +44,12 @@ def create_app(config_name='development'):
 
     return app
 
+# --- FIX START: Gunicorn looks for this 'app' variable at the top level ---
+env = os.getenv('FLASK_ENV', 'production')
+app = create_app(env)
+# --- FIX END ---
+
 if __name__ == '__main__':
-    env = os.getenv('FLASK_ENV', 'development')
-    app = create_app(env)
-    app.run(host='0.0.0.0', port=5000, debug=(env == 'development'))
-app = create_app('production')
+    # Cloud Run/Shell require binding to the PORT environment variable
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=(env == 'development'))
