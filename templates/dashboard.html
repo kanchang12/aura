@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+    <h1 style="margin-bottom: 0.5rem;">Welcome, {{ current_user.full_name }}</h1>
+    <p style="color: var(--text-light);">Complete all three modules to earn your certificate</p>
+</div>
+
+{% set all_passed = results|length == 3 and results.values()|selectattr('passed')|list|length == 3 %}
+
+<div class="module-grid">
+    {% for module_id, module in modules.items() %}
+    {% set result = results.get(module_id) %}
+    <div class="module-card">
+        <div class="module-icon">{{ module.icon }}</div>
+        <div class="module-title">{{ module.title }}</div>
+        <p style="color: var(--text-light); margin-bottom: 1rem;">{{ module.description }}</p>
+        
+        {% if result and result.passed %}
+            <span class="status-badge status-complete">✓ Completed ({{ result.score }}/{{ result.total }})</span>
+        {% elif result %}
+            <span class="status-badge status-pending">Score: {{ result.score }}/{{ result.total }} - Try Again</span>
+        {% else %}
+            <span class="status-badge status-pending">Not Started</span>
+        {% endif %}
+        
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('module', module_id=module_id) }}" class="btn btn-primary" style="font-size: 0.875rem;">
+                {% if result and result.passed %}Review Module{% else %}Start Module{% endif %}
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if all_passed %}
+<div class="card" style="text-align: center; margin-top: 2rem; background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);">
+    <h2 style="color: #276749; margin-bottom: 1rem;">🎉 Congratulations!</h2>
+    <p style="margin-bottom: 1.5rem;">You have completed all modules. Download your certificate below.</p>
+    <a href="{{ url_for('certificate') }}" class="btn btn-secondary">View Certificate</a>
+    <a href="{{ url_for('download_certificate') }}" class="btn btn-primary" style="margin-left: 1rem;">Download PDF</a>
+</div>
+{% else %}
+<div class="card" style="margin-top: 2rem;">
+    <h3 style="margin-bottom: 0.5rem;">Your Progress</h3>
+    <div style="background: var(--border); border-radius: 10px; height: 20px; overflow: hidden;">
+        {% set completed = results.values()|selectattr('passed')|list|length %}
+        <div style="background: var(--secondary); height: 100%; width: {{ (completed / 3 * 100)|int }}%; transition: width 0.3s;"></div>
+    </div>
+    <p style="color: var(--text-light); margin-top: 0.5rem;">{{ completed }} of 3 modules completed</p>
+</div>
+{% endif %}
+{% endblock %}

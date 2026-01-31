@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ module.title }} Quiz{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+    <a href="{{ url_for('module', module_id=module_id) }}" style="color: var(--primary); text-decoration: none;">← Back to Video</a>
+</div>
+
+<div class="card">
+    <div style="display: flex; align-items: center; margin-bottom: 2rem;">
+        <span style="font-size: 2rem; margin-right: 1rem;">{{ module.icon }}</span>
+        <div>
+            <h1 style="margin-bottom: 0.25rem;">{{ module.title }} Quiz</h1>
+            <p style="color: var(--text-light);">Answer all 5 questions. You need 80% to pass.</p>
+        </div>
+    </div>
+    
+    <form method="POST">
+        {% for q in questions %}
+        <div class="quiz-question">
+            <h3>{{ loop.index }}. {{ q.question }}</h3>
+            {% for option in q.options %}
+            <label class="quiz-option">
+                <input type="radio" name="q{{ loop.index0 }}" value="{{ loop.index0 }}" required>
+                {{ option }}
+            </label>
+            {% endfor %}
+        </div>
+        {% endfor %}
+        
+        <div style="text-align: center; padding-top: 1rem;">
+            <button type="submit" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 3rem;">
+                Submit Answers
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

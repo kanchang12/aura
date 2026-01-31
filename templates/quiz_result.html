@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+<div class="card result-box">
+    {% if passed %}
+    <div style="font-size: 4rem; margin-bottom: 1rem;">🎉</div>
+    <h1 style="color: var(--secondary); margin-bottom: 1rem;">Well Done!</h1>
+    <div class="result-score result-pass">{{ score }}/{{ total }}</div>
+    <p style="color: var(--text-light); margin: 1rem 0;">You have passed the {{ module.title }} module!</p>
+    {% else %}
+    <div style="font-size: 4rem; margin-bottom: 1rem;">📚</div>
+    <h1 style="color: #e53e3e; margin-bottom: 1rem;">Not Quite</h1>
+    <div class="result-score result-fail">{{ score }}/{{ total }}</div>
+    <p style="color: var(--text-light); margin: 1rem 0;">You need 4 out of 5 to pass. Please review the video and try again.</p>
+    {% endif %}
+    
+    <div style="margin-top: 2rem;">
+        {% if passed %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Continue to Dashboard</a>
+        {% else %}
+        <a href="{{ url_for('module', module_id=module_id) }}" class="btn btn-accent" style="margin-right: 1rem;">Review Video</a>
+        <a href="{{ url_for('quiz', module_id=module_id) }}" class="btn btn-primary">Try Again</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

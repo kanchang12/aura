@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Admin Dashboard</h1>
+
+<div class="module-grid" style="margin-bottom: 2rem;">
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--primary); font-weight: 700;">{{ stats.total_users }}</div>
+        <div style="color: var(--text-light);">Registered Users</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--secondary); font-weight: 700;">{{ stats.fully_certified }}</div>
+        <div style="color: var(--text-light);">Fully Certified</div>
+    </div>
+    <div class="card" style="text-align: center;">
+        <div style="font-size: 2.5rem; color: var(--accent); font-weight: 700;">
+            {% if stats.total_users > 0 %}
+            {{ ((stats.fully_certified / stats.total_users) * 100)|round|int }}%
+            {% else %}
+            0%
+            {% endif %}
+        </div>
+        <div style="color: var(--text-light);">Completion Rate</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2 style="margin-bottom: 1rem;">Module Completion</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align: left; padding: 0.75rem;">Module</th>
+                <th style="text-align: right; padding: 0.75rem;">Completions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.75rem;">🤝 Support</td>
+                <td style="text-align: right; padding: 0.75rem;">{{ stats.completed_support }}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.75rem;">♿ Accessibility</td>
+                <td style="text-align: right; padding: 0.75rem;">{{ stats.completed_accessibility }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.75rem;">🚗 Mobility</td>
+                <td style="text-align: right; padding: 0.75rem;">{{ stats.completed_mobility }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="card" style="margin-top: 1.5rem;">
+    <h2 style="margin-bottom: 1rem;">Recent Users</h2>
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align: left; padding: 0.75rem;">Name</th>
+                <th style="text-align: left; padding: 0.75rem;">Email</th>
+                <th style="text-align: left; padding: 0.75rem;">Badge</th>
+                <th style="text-align: center; padding: 0.75rem;">Progress</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users[-10:]|reverse %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.75rem;">{{ user.full_name }}</td>
+                <td style="padding: 0.75rem;">{{ user.email }}</td>
+                <td style="padding: 0.75rem;">{{ user.badge_number or '-' }}</td>
+                <td style="text-align: center; padding: 0.75rem;">
+                    {% set passed = user.results|selectattr('passed')|list|length %}
+                    {% if passed == 3 %}
+                    <span class="status-badge status-complete">Certified</span>
+                    {% else %}
+                    <span class="status-badge status-pending">{{ passed }}/3</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
